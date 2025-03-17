@@ -168,127 +168,43 @@ def initialize_rag_backend(markdown_content):
     return RAGBackend(markdown_content=markdown_content)
 
 def main():
-    # Page config - Using centered layout with expanded sidebar
+    # Page config - Using centered layout with collapsed sidebar
     st.set_page_config(
         page_title="Startup Deck Assistant",
         page_icon="🚀",
         layout="centered",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="collapsed"
     )
     
-    # Apply custom CSS for styling - UPDATED FOR WHITE THEME
+    # Apply custom CSS for styling with darker theme
     st.markdown("""
     <style>
-        /* Force light theme */
-        .stApp {
-            background-color: #ffffff;
-            color: #000000;
+        .stChat {
+            border-radius: 10px;
+            padding: 10px;
         }
-        
-        /* Chat message styling with explicit text colors */
         .chat-message {
-            padding: 1.2rem;
-            border-radius: 15px;
-            margin-bottom: 1.2rem;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
             display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
         }
         .chat-message.user {
-            background-color: #f0f0f0;
-            border-bottom-right-radius: 5px;
-            border-left: 4px solid #4e89e8;
-            color: #000000 !important;
+            background-color: #2b313e;
         }
         .chat-message.assistant {
-            background-color: #f8f8f8;
-            border-bottom-left-radius: 5px;
-            border-right: 4px solid #6c757d;
-            color: #000000 !important;
-        }
-        
-        .chat-message .message {
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            line-height: 1.6;
-            color: #000000 !important;
-        }
-        
-        /* Fix for app title container */
-        .app-title-container {
-            background-color: #4e89e8;
-            color: white !important;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: center;
+            background-color: #475063;
         }
         .app-title {
-            color: white !important;
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
         }
-        .app-subtitle {
-            color: white !important;
-            margin-top: 5px;
-            font-size: 1.1rem;
-        }
-        
-        /* Ensure dark text on light backgrounds */
-        p, h1, h2, h3, h4, h5, h6, li, span, div {
-            color: #000000;
-        }
-        
-        /* Override Streamlit's dark mode */
-        @media (prefers-color-scheme: dark) {
-            .stApp {
-                background-color: #ffffff;
-            }
-            .stTextInput > div > div > input {
-                color: #000000;
-            }
-            .stMarkdown p {
-                color: #000000;
-            }
-        }
-        
-        /* Other styles remain the same */
-        .stTextInput > div > div > input {
+        .stButton button {
             border-radius: 20px;
-            border: 1px solid #e0e0e0;
-            padding: 10px 15px;
-            color: #000000;
-        }
-        
-        .chat-message .avatar {
-            width: 45px;
-            min-width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 22px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 2px solid #ffffff;
-        }
-        
-        /* Make sure the sidebar has the right colors */
-        .css-1d391kg, .css-1lcbmhc {
-            background-color: #f8f9fa !important;
-            color: #000000 !important;
-        }
-        
-        /* Override Streamlit's default styling */
-        .element-container, .stAlert, .stButton, .stMarkdown {
-            color: #000000 !important;
+            padding: 0.5rem 1rem;
         }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
     
     # Initialize session state for chat history
     if "messages" not in st.session_state:
@@ -312,40 +228,22 @@ def main():
         st.session_state.rag_backend = initialize_rag_backend(markdown_content)
     
     # Title area - simplified layout
-    st.markdown("""
-    <div class="app-title-container">
-        <h1 class="app-title">Startup Deck Assistant</h1>
-        <p class="app-subtitle">Your personal guide to startup pitch decks</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<h1 class='app-title'>Startup Deck Assistant</h1>", unsafe_allow_html=True)
     
-    # Centered logo display
-    try:
-        col1, col2, col3 = st.columns([1, 3, 1])
-        with col2:
+    # Top controls row with logo and new chat button
+    col1, col2, col3 = st.columns([1, 3, 1])
+        
+    with col2:
+        try:
             st.image("image.png")
-
-    except Exception as e:
-        print(f"Error loading logo: {e}")
+        except Exception as e:
+            print(f"Error loading logo: {e}")
     
-    # Add the New Chat button to sidebar
-    with st.sidebar:
-        st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Options</h3>", unsafe_allow_html=True)
-        st.markdown('<div class="new-chat-button">', unsafe_allow_html=True)
+    with col3:
         new_chat_button = st.button(
-            "🔄 Start New Chat", 
-            help="Clear current conversation and start a fresh chat",
+            "New Chat", 
             use_container_width=True
         )
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Add some spacing
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        
-        # Add additional info in the sidebar
-        st.markdown("### About")
-        st.markdown("This assistant helps you create and understand startup pitch decks.")
-        
         if new_chat_button:
             st.session_state.messages = []
             st.session_state.processing = False
@@ -353,41 +251,32 @@ def main():
             time.sleep(0.5)  # Short delay for the success message to be seen
             st.rerun()
     
-    # Custom divider
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    # Display chat messages - simple divider
+    st.divider()
     
-    # Display chat messages
+    # Display chat messages using Streamlit's built-in chat message component
     message_container = st.container()
     with message_container:
         if not st.session_state.messages:
-            # Empty state message - REMOVED BROKEN IMAGE
+            # Empty state message
             st.markdown("""
-            <div style="text-align: center; padding: 40px 20px; color: #6c757d; background-color: rgba(248,248,248,0.7); border-radius: 10px; margin: 30px 0;">
-                <h3 style="margin-top: 20px; font-weight: 500;">Welcome to Startup Deck Assistant!</h3>
-                <p style="margin-top: 10px; font-size: 1.1rem;">Ask me anything about startup pitch decks.</p>
+            <div style="text-align: center; padding: 20px; color: #888;">
+                <h3>Welcome to Startup Deck Assistant!</h3>
+                <p>Ask me anything about startup pitch decks.</p>
             </div>
             """, unsafe_allow_html=True)
         else:
             for message in st.session_state.messages:
-                with st.container():
-                    role = message["role"]
-                    content = message["content"]
-                    
-                    avatar = "👤" if role == "user" else "🤖"
-                    background = "user" if role == "user" else "assistant"
-                    
-                    st.markdown(f"""
-                    <div class="chat-message {background}">
-                        <div class="avatar">{avatar}</div>
-                        <div class="message">{content}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                role = message["role"]
+                content = message["content"]
+                # Use Streamlit's built-in chat message component
+                st.chat_message(role).write(content)
     
-    # Custom divider before input
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    # Another divider before input
+    st.divider()
     
-    # Chat input using st.chat_input instead of text_input
-    user_input = st.chat_input("Ask about the startup decks...", disabled=st.session_state.processing)
+    # Chat input
+    user_input = st.chat_input("Ask about startup decks...", disabled=st.session_state.processing)
     
     if user_input and not st.session_state.processing:
         # Validate user input
@@ -402,7 +291,7 @@ def main():
         # Mark as processing to prevent multiple requests
         st.session_state.processing = True
         
-        # Add user message to UI chat
+        # Add user message to messages list
         st.session_state.messages.append({"role": "user", "content": user_input})
         
         # Rerun to show user message immediately
@@ -423,92 +312,68 @@ def main():
         # Create status indicator
         status = st.status("Generating response...", expanded=False)
         
-        # Create a placeholder for the assistant's response
-        with st.container():
-            assistant_msg = {"role": "assistant", "content": ""}
-            st.session_state.messages.append(assistant_msg)
-            
-            # Reference to update the last message
-            last_idx = len(st.session_state.messages) - 1
-            
-            message_placeholder = st.empty()
-            message_placeholder.markdown(f"""
-            <div class="chat-message assistant">
-                <div class="avatar">🤖</div>
-                <div class="message">Thinking...</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            try:
-                # Generate response using the RAG backend with validated user message
-                async def run_stream_query():
-                    full_response = ""
-                    try:
-                        async for text_chunk in st.session_state.rag_backend.stream_query(user_message):
-                            if text_chunk:  # Check if chunk is not empty
-                                full_response += text_chunk
-                                message_placeholder.markdown(f"""
-                                <div class="chat-message assistant">
-                                    <div class="avatar">🤖</div>
-                                    <div class="message">{full_response}</div>
-                                </div>
-                                """, unsafe_allow_html=True)
-                                
-                                # Update the message in session state
-                                st.session_state.messages[last_idx]["content"] = full_response
-                                status.update(label="Generating response...", state="running")
-                                time.sleep(0.01)  # Slight delay for UI updates
-                        
-                        # If we got an empty response, provide a fallback
-                        if not full_response:
-                            full_response = "I'm having trouble generating a response right now. Please try again."
-                            message_placeholder.markdown(f"""
-                            <div class="chat-message assistant">
-                                <div class="avatar">🤖</div>
-                                <div class="message">{full_response}</div>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            st.session_state.messages[last_idx]["content"] = full_response
+        # Add assistant message placeholder
+        assistant_container = st.chat_message("assistant")
+        message_placeholder = assistant_container.empty()
+        
+        # Add an empty assistant message to our history
+        assistant_msg = {"role": "assistant", "content": ""}
+        st.session_state.messages.append(assistant_msg)
+        
+        # Reference to update the last message
+        last_idx = len(st.session_state.messages) - 1
+        
+        try:
+            # Generate response using the RAG backend with validated user message
+            async def run_stream_query():
+                full_response = ""
+                try:
+                    async for text_chunk in st.session_state.rag_backend.stream_query(user_message):
+                        if text_chunk:  # Check if chunk is not empty
+                            full_response += text_chunk
+                            # Update the placeholder with the current response
+                            message_placeholder.write(full_response)
                             
-                    except Exception as e:
-                        print(f"Stream query error: {e}")
-                        full_response = f"Sorry, there was an error generating a response: {str(e)}"
-                        message_placeholder.markdown(f"""
-                        <div class="chat-message assistant">
-                            <div class="avatar">🤖</div>
-                            <div class="message">{full_response}</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        st.session_state.messages[last_idx]["content"] = full_response
+                            # Update the message in session state
+                            st.session_state.messages[last_idx]["content"] = full_response
+                            status.update(label="Generating response...", state="running")
+                            time.sleep(0.01)  # Slight delay for UI updates
                     
-                    # Final update with complete response
-                    status.update(label="Response complete!", state="complete")
+                    # If we got an empty response, provide a fallback
+                    if not full_response:
+                        full_response = "I'm having trouble generating a response right now. Please try again."
+                        message_placeholder.write(full_response)
+                        st.session_state.messages[last_idx]["content"] = full_response
+                        
+                except Exception as e:
+                    print(f"Stream query error: {e}")
+                    full_response = f"Sorry, there was an error generating a response: {str(e)}"
+                    message_placeholder.write(full_response)
+                    st.session_state.messages[last_idx]["content"] = full_response
                 
-                # Run the async function
-                asyncio.run(run_stream_query())
-                
-                # Close status after a short delay
-                time.sleep(0.5)
-                status.update(state="complete", expanded=False)
-                
-            except Exception as e:
-                error_msg = f"Error generating response: {str(e)}"
-                message_placeholder.markdown(f"""
-                <div class="chat-message assistant">
-                    <div class="avatar">🤖</div>
-                    <div class="message">{error_msg}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                st.session_state.messages[last_idx]["content"] = error_msg
-                status.update(label="Error", state="error")
+                # Final update with complete response
+                status.update(label="Response complete!", state="complete")
             
-            # Reset processing flag
-            st.session_state.processing = False
-            st.rerun()
+            # Run the async function
+            asyncio.run(run_stream_query())
+            
+            # Close status after a short delay
+            time.sleep(0.5)
+            status.update(state="complete", expanded=False)
+            
+        except Exception as e:
+            error_msg = f"Error generating response: {str(e)}"
+            message_placeholder.write(error_msg)
+            st.session_state.messages[last_idx]["content"] = error_msg
+            status.update(label="Error", state="error")
+        
+        # Reset processing flag
+        st.session_state.processing = False
+        st.rerun()
 
     # Footer
     st.markdown("""
-    <div class="footer-text">
+    <div style="text-align: center; margin-top: 2rem; color: #888;">
         <p>Startup Deck Assistant - Powered by OpenAI & Streamlit</p>
     </div>
     """, unsafe_allow_html=True)
