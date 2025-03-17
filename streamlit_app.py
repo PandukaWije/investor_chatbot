@@ -173,7 +173,8 @@ def main():
         page_title="Startup Deck Assistant",
         page_icon="🚀",
         layout="centered",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="expanded",
+        theme="light"
     )
     
     # Apply custom CSS for styling - UPDATED FOR WHITE THEME
