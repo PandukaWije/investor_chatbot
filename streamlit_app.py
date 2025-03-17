@@ -168,20 +168,19 @@ def initialize_rag_backend(markdown_content):
     return RAGBackend(markdown_content=markdown_content)
 
 def main():
-    # Page config - Using centered layout
+    # Page config - Using centered layout with expanded sidebar
     st.set_page_config(
         page_title="Startup Deck Assistant",
         page_icon="🚀",
         layout="centered",
-        initial_sidebar_state="collapsed"
+        initial_sidebar_state="expanded"
     )
     
-    # Apply custom CSS for styling
+    # Apply custom CSS for styling - UPDATED FOR WHITE THEME
     st.markdown("""
     <style>
         .main {
-            background-color: #f0f5ff;
-            background-image: linear-gradient(135deg, #f0f5ff 0%, #e6f0ff 100%);
+            background-color: #ffffff;
         }
         .stTextInput > div > div > input {
             border-radius: 20px;
@@ -196,21 +195,14 @@ def main():
             flex-direction: row;
             align-items: flex-start;
             box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            transition: all 0.2s ease;
-        }
-        .chat-message:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
         }
         .chat-message.user {
-            background-color: #e1f0ff;
-            background-image: linear-gradient(to right, #e1f0ff, #d1e6ff);
+            background-color: #f0f0f0;
             border-bottom-right-radius: 5px;
             border-left: 4px solid #4e89e8;
         }
         .chat-message.assistant {
-            background-color: #f0f2f6;
-            background-image: linear-gradient(to right, #f5f7fa, #f0f2f6);
+            background-color: #f8f8f8;
             border-bottom-left-radius: 5px;
             border-right: 4px solid #6c757d;
         }
@@ -242,7 +234,6 @@ def main():
             padding: 0.5rem 1rem;
             font-weight: 500;
             border: none;
-            transition: all 0.3s ease;
         }
         .new-chat-button button {
             background-color: #4e89e8;
@@ -250,54 +241,58 @@ def main():
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .new-chat-button button:hover {
             background-color: #3a76d0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transform: translateY(-2px);
         }
         .new-chat-button svg {
             margin-right: 8px;
         }
+        /* Simplified title container */
         .app-title-container {
             background-color: #4e89e8;
             color: white;
             padding: 15px 20px;
             border-radius: 10px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             text-align: center;
-            transform: translateY(0);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .app-title-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
         .app-title {
             margin: 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            font-size: 2rem;
+            font-weight: 600;
         }
         .app-subtitle {
-            font-style: italic;
             margin-top: 5px;
             font-size: 1.1rem;
-            opacity: 0.9;
         }
         .logo-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 25px 0;
+            margin: 25px auto;
             text-align: center;
+            width: 100%;
+        }
+        
+        /* Sidebar styling */
+        .css-1d391kg, .css-1lcbmhc {
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+        }
+        
+        /* Style sidebar headings */
+        .sidebar .stMarkdown h3 {
+            color: #4e89e8;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
         .divider {
             height: 1px;
-            background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+            background-color: #e0e0e0;
             margin: 25px 0;
         }
         footer {visibility: hidden;}
@@ -358,8 +353,7 @@ def main():
         # Initialize RAG backend
         st.session_state.rag_backend = initialize_rag_backend(markdown_content)
     
-    # Title area - restructured layout
-    # Modern title container (full width)
+    # Title area - simplified layout
     st.markdown("""
     <div class="app-title-container">
         <h1 class="app-title">Startup Deck Assistant</h1>
@@ -367,20 +361,18 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Two column layout for logo and button
-    col1, col2 = st.columns([3, 1])
+    # Centered logo display
+    try:
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col2:
+            st.image("image.png")
+
+    except Exception as e:
+        print(f"Error loading logo: {e}")
     
-    # Logo display - in left column with larger size
-    with col1:
-        try:
-            st.markdown('<div class="logo-container">', unsafe_allow_html=True)
-            st.image("image.png", width=250)
-            st.markdown('</div>', unsafe_allow_html=True)
-        except Exception as e:
-            print(f"Error loading logo: {e}")
-    
-    # New Chat button - in right column
-    with col2:
+    # Add the New Chat button to sidebar
+    with st.sidebar:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Options</h3>", unsafe_allow_html=True)
         st.markdown('<div class="new-chat-button">', unsafe_allow_html=True)
         new_chat_button = st.button(
             "🔄 Start New Chat", 
@@ -388,6 +380,13 @@ def main():
             use_container_width=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Add some spacing
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        
+        # Add additional info in the sidebar
+        st.markdown("### About")
+        st.markdown("This assistant helps you create and understand startup pitch decks.")
         
         if new_chat_button:
             st.session_state.messages = []
@@ -399,16 +398,13 @@ def main():
     # Custom divider
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
-    st.markdown("---")
-    
     # Display chat messages
     message_container = st.container()
     with message_container:
         if not st.session_state.messages:
-            # Empty state message
+            # Empty state message - REMOVED BROKEN IMAGE
             st.markdown("""
-            <div style="text-align: center; padding: 40px 20px; color: #6c757d; background-color: rgba(255,255,255,0.7); border-radius: 10px; margin: 30px 0;">
-                <img src="https://emojipedia-us.s3.amazonaws.com/source/noto-emoji-animations/344/rocket_1f680.gif" width="80">
+            <div style="text-align: center; padding: 40px 20px; color: #6c757d; background-color: rgba(248,248,248,0.7); border-radius: 10px; margin: 30px 0;">
                 <h3 style="margin-top: 20px; font-weight: 500;">Welcome to Startup Deck Assistant!</h3>
                 <p style="margin-top: 10px; font-size: 1.1rem;">Ask me anything about startup pitch decks.</p>
             </div>
