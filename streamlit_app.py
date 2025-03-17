@@ -173,165 +173,122 @@ def main():
         page_title="Startup Deck Assistant",
         page_icon="🚀",
         layout="centered",
-        initial_sidebar_state="expanded",
-        theme="light"
+        initial_sidebar_state="expanded"
     )
     
     # Apply custom CSS for styling - UPDATED FOR WHITE THEME
     st.markdown("""
-    <style>
-        .main {
+<style>
+    /* Force light theme */
+    .stApp {
+        background-color: #ffffff;
+        color: #000000;
+    }
+    
+    /* Chat message styling with explicit text colors */
+    .chat-message {
+        padding: 1.2rem;
+        border-radius: 15px;
+        margin-bottom: 1.2rem;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+    .chat-message.user {
+        background-color: #f0f0f0;
+        border-bottom-right-radius: 5px;
+        border-left: 4px solid #4e89e8;
+        color: #000000 !important;
+    }
+    .chat-message.assistant {
+        background-color: #f8f8f8;
+        border-bottom-left-radius: 5px;
+        border-right: 4px solid #6c757d;
+        color: #000000 !important;
+    }
+    
+    .chat-message .message {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.6;
+        color: #000000 !important;
+    }
+    
+    /* Fix for app title container */
+    .app-title-container {
+        background-color: #4e89e8;
+        color: white !important;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    .app-title {
+        color: white !important;
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+    .app-subtitle {
+        color: white !important;
+        margin-top: 5px;
+        font-size: 1.1rem;
+    }
+    
+    /* Ensure dark text on light backgrounds */
+    p, h1, h2, h3, h4, h5, h6, li, span, div {
+        color: #000000;
+    }
+    
+    /* Override Streamlit's dark mode */
+    @media (prefers-color-scheme: dark) {
+        .stApp {
             background-color: #ffffff;
         }
         .stTextInput > div > div > input {
-            border-radius: 20px;
-            border: 1px solid #e0e0e0;
-            padding: 10px 15px;
+            color: #000000;
         }
-        .chat-message {
-            padding: 1.2rem;
-            border-radius: 15px;
-            margin-bottom: 1.2rem;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        .stMarkdown p {
+            color: #000000;
         }
-        .chat-message.user {
-            background-color: #f0f0f0;
-            border-bottom-right-radius: 5px;
-            border-left: 4px solid #4e89e8;
-        }
-        .chat-message.assistant {
-            background-color: #f8f8f8;
-            border-bottom-left-radius: 5px;
-            border-right: 4px solid #6c757d;
-        }
-        .chat-message .avatar {
-            width: 45px;
-            min-width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 22px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 2px solid #ffffff;
-        }
-        .chat-message .message {
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            line-height: 1.6;
-        }
-        .button-container {
-            display: flex;
-            gap: 10px;
-        }
-        .stButton button {
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-            border: none;
-        }
-        .new-chat-button button {
-            background-color: #4e89e8;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .new-chat-button button:hover {
-            background-color: #3a76d0;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .new-chat-button svg {
-            margin-right: 8px;
-        }
-        /* Simplified title container */
-        .app-title-container {
-            background-color: #4e89e8;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .app-title {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 600;
-        }
-        .app-subtitle {
-            margin-top: 5px;
-            font-size: 1.1rem;
-        }
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 25px auto;
-            text-align: center;
-            width: 100%;
-        }
-        
-        /* Sidebar styling */
-        .css-1d391kg, .css-1lcbmhc {
-            background-color: #f8f9fa;
-            padding-top: 2rem;
-        }
-        
-        /* Style sidebar headings */
-        .sidebar .stMarkdown h3 {
-            color: #4e89e8;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .divider {
-            height: 1px;
-            background-color: #e0e0e0;
-            margin: 25px 0;
-        }
-        footer {visibility: hidden;}
-        .css-1dp5vir {visibility: hidden;}
-        /* Hide Streamlit branding */
-        #MainMenu {visibility: hidden;}
-        .stDeployButton {display:none;}
-        /* Reduce padding/margins for a cleaner look */
-        .block-container {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-        /* Chat input styling */
-        .stChatInput {
-            padding-bottom: 10px;
-        }
-        .stChatInput > div > div > input::placeholder {
-            color: #6c757d;
-        }
-        .stChatInput > div > div > input:focus {
-            border-color: #4e89e8;
-            box-shadow: 0 0 0 2px rgba(78, 137, 232, 0.25);
-        }
-        /* Status indicator styling */
-        .stStatus {
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .footer-text {
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.9rem;
-            margin-top: 30px;
-            padding: 10px;
-            border-top: 1px solid #e9ecef;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    }
+    
+    /* Other styles remain the same */
+    .stTextInput > div > div > input {
+        border-radius: 20px;
+        border: 1px solid #e0e0e0;
+        padding: 10px 15px;
+        color: #000000;
+    }
+    
+    .chat-message .avatar {
+        width: 45px;
+        min-width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 22px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border: 2px solid #ffffff;
+    }
+    
+    /* Make sure the sidebar has the right colors */
+    .css-1d391kg, .css-1lcbmhc {
+        background-color: #f8f9fa !important;
+        color: #000000 !important;
+    }
+    
+    /* Override Streamlit's default styling */
+    .element-container, .stAlert, .stButton, .stMarkdown {
+        color: #000000 !important;
+    }
+</style>
+""", unsafe_allow_html=True)
     
     # Initialize session state for chat history
     if "messages" not in st.session_state:
